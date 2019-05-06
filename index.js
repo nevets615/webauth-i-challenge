@@ -46,13 +46,23 @@ server.post('/api/login', (req, res) => {
     });
 });
 
-server.get('/api/users', (req, res) => {
+server.get('/api/users', protected, (req, res) => {
   Users.find()
     .then(users => {
       res.json(users);
     })
     .catch(err => res.send(err));
 });
+
+function protected(req, res, next) {
+    const  {username, password} = req.headers;
+
+    if(username && password) {
+        next();
+    } else {
+        res.status(400).json({ message: 'please provide credentials'})
+    }
+}
 
 const port = process.env.PORT || 3300;
 server.listen(port, () => console.log(`\n** Running on port ${port} **\n`));
